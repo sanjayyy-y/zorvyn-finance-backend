@@ -25,6 +25,11 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'API is running successfully.' });
 });
 
+// redirect root to api docs
+app.get('/', (req, res) => {
+  res.redirect('/api-docs');
+});
+
 app.use('/api', routes);
 
 // 404 handler for undefined routes
