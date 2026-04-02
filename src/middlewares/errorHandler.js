@@ -12,15 +12,15 @@ const globalErrorHandler = (err, req, res, next) => {
       stack: err.stack,
     });
   } else {
-    // Production Mode: Send generic message for unknown errors
+    // in production, only show message for known errors
     if (err.isOperational) {
       res.status(err.statusCode).json({
         status: err.status,
         message: err.message,
       });
     } else {
-      // Programming or other unknown error: don't leak error details
-      console.error('ERROR 💥', err);
+      // unknown error — log it but don't expose details to client
+      console.error('ERROR:', err);
       res.status(500).json({
         status: 'error',
         message: 'Something went very wrong!',

@@ -32,7 +32,7 @@ const transactionSchema = new mongoose.Schema(
     isDeleted: {
       type: Boolean,
       default: false,
-      select: false, // Hide by default
+      select: false,
     },
   },
   {
@@ -40,13 +40,13 @@ const transactionSchema = new mongoose.Schema(
   }
 );
 
-// Query Middleware: Hide soft-deleted records from standard queries
+// automatically filter out soft-deleted records on any find query
 transactionSchema.pre(/^find/, function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-// Add indexing for faster querying on dashboard aggregations
+// indexes for common query patterns
 transactionSchema.index({ type: 1, date: -1 });
 transactionSchema.index({ category: 1 });
 

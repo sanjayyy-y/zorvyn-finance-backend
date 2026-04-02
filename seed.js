@@ -12,7 +12,7 @@ const importData = async () => {
     await User.deleteMany();
     await Transaction.deleteMany();
 
-    // 1. Create Admin
+    // setup admin
     const adminUser = await User.create({
       name: 'Super Admin',
       email: 'admin@finance.com',
@@ -20,7 +20,7 @@ const importData = async () => {
       role: 'ADMIN',
     });
 
-    // 2. Create Analyst
+    // setup analyst
     const analystUser = await User.create({
       name: 'Data Analyst',
       email: 'analyst@finance.com',
@@ -28,7 +28,7 @@ const importData = async () => {
       role: 'ANALYST',
     });
 
-    // 3. Create Viewer
+    // setup viewer
     const viewerUser = await User.create({
       name: 'Read Viewer',
       email: 'viewer@finance.com',
@@ -36,7 +36,7 @@ const importData = async () => {
       role: 'VIEWER',
     });
 
-    // 4. Create some MOCK transactions
+    // insert some mock transactions
     await Transaction.create([
       {
         amount: 5000,

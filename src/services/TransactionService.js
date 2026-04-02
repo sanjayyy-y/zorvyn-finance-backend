@@ -16,7 +16,7 @@ class TransactionService {
   static async getTransactions(query) {
     const { page = 1, limit = 10, category, type, startDate, endDate } = query;
     
-    // Build filter object
+    // build filter from query params
     const filter = {};
     if (category) filter.category = category;
     if (type) filter.type = type;
@@ -26,7 +26,6 @@ class TransactionService {
       if (endDate) filter.date.$lte = new Date(endDate);
     }
 
-    // Pagination
     const skip = (page - 1) * limit;
 
     const [transactions, total] = await Promise.all([
@@ -72,7 +71,7 @@ class TransactionService {
     const transaction = await Transaction.findById(id);
     if (!transaction) throw new AppError('Transaction not found', 404);
 
-    // Soft delete
+    // soft delete — just flag it, don't actually remove
     transaction.isDeleted = true;
     await transaction.save();
 

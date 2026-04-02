@@ -1,7 +1,5 @@
-/**
- * Quick API smoke test — hits every endpoint and prints results.
- * Run: node test-api.js
- */
+// quick smoke test for all endpoints
+// run with: node tests.js (while server is running)
 
 const BASE = 'http://localhost:5000/api';
 
@@ -24,7 +22,7 @@ function log(label, result) {
 (async () => {
   console.log('=== FINANCE BACKEND API SMOKE TEST ===\n');
 
-  // 1. Register a new user
+  // register a new user
   const reg = await request('POST', '/auth/register', {
     name: 'Test User',
     email: 'testuser@example.com',
@@ -32,7 +30,7 @@ function log(label, result) {
   });
   log('Register new user', reg);
 
-  // 2. Login as Admin
+  // login as Admin
   const adminLogin = await request('POST', '/auth/login', {
     email: 'admin@finance.com',
     password: 'password123',
@@ -40,7 +38,7 @@ function log(label, result) {
   log('Login as ADMIN', adminLogin);
   const adminToken = adminLogin.data?.token;
 
-  // 3. Login as Viewer
+  // login as Viewer
   const viewerLogin = await request('POST', '/auth/login', {
     email: 'viewer@finance.com',
     password: 'password123',
@@ -48,7 +46,7 @@ function log(label, result) {
   log('Login as VIEWER', viewerLogin);
   const viewerToken = viewerLogin.data?.token;
 
-  // 4. Login as Analyst
+  // login as Analyst
   const analystLogin = await request('POST', '/auth/login', {
     email: 'analyst@finance.com',
     password: 'password123',
@@ -56,17 +54,17 @@ function log(label, result) {
   log('Login as ANALYST', analystLogin);
   const analystToken = analystLogin.data?.token;
 
-  // 5. RBAC: Viewer tries to create transaction (should FAIL 403)
+  // rbac: Viewer tries to create transaction (should FAIL 403)
   const viewerCreate = await request('POST', '/transactions', {
     amount: 100, type: 'INCOME', category: 'Test',
   }, viewerToken);
   log('RBAC: Viewer tries to CREATE transaction (expect 403)', viewerCreate);
 
-  // 6. RBAC: Viewer tries to GET transactions (should FAIL 403)
+  // rbac: Viewer tries to GET transactions (should FAIL 403)
   const viewerGet = await request('GET', '/transactions', null, viewerToken);
   log('RBAC: Viewer tries to GET transactions (expect 403)', viewerGet);
 
-  // 7. Admin creates a transaction
+  // admin creates a transaction
   const create = await request('POST', '/transactions', {
     amount: 750,
     type: 'EXPENSE',
@@ -77,11 +75,11 @@ function log(label, result) {
   log('Admin creates transaction', create);
   const txnId = create.data?.data?.transaction?._id;
 
-  // 8. Analyst reads transactions (should work)
+  // analyst reads transactions (should work)
   const analystRead = await request('GET', '/transactions?page=1&limit=5', null, analystToken);
   log('Analyst reads transactions (expect 200)', analystRead);
 
-  // 9. Admin updates the transaction
+  // admin updates the transaction
   if (txnId) {
     const update = await request('PUT', `/transactions/${txnId}`, {
       amount: 800, notes: 'Updated - Google Ads Q1',
@@ -89,25 +87,25 @@ function log(label, result) {
     log('Admin updates transaction', update);
   }
 
-  // 10. Admin soft-deletes the transaction
+  // admin soft-deletes the transaction
   if (txnId) {
     const del = await request('DELETE', `/transactions/${txnId}`, null, adminToken);
     log(`Admin soft-deletes transaction (expect 204)`, { status: del.status, data: del.data || 'No Content' });
   }
 
-  // 11. Dashboard Summary
+  // dashboard summary
   const summary = await request('GET', '/dashboard/summary', null, adminToken);
   log('Dashboard Summary', summary);
 
-  // 12. Dashboard Trends
+  // dashboard trends
   const trends = await request('GET', '/dashboard/trends', null, adminToken);
   log('Dashboard Trends', trends);
 
-  // 13. Admin lists all users
+  // admin lists all users
   const users = await request('GET', '/users', null, adminToken);
   log('Admin lists all users', users);
 
-  // 14. Validation: bad input
+  // validation: bad input
   const badInput = await request('POST', '/auth/register', {
     name: '',
     email: 'not-an-email',
@@ -115,7 +113,7 @@ function log(label, result) {
   });
   log('Validation: bad register input (expect 400)', badInput);
 
-  // 15. Auth: no token
+  // auth: no token
   const noAuth = await request('GET', '/transactions');
   log('No token on protected route (expect 401)', noAuth);
 

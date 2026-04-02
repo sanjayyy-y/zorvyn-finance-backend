@@ -2,10 +2,9 @@ const Transaction = require('../models/Transaction');
 
 class DashboardService {
   static async getSummary() {
-    // We only want to aggregate non-deleted transactions.
+    // skip soft-deleted ones
     const matchStage = { $match: { isDeleted: { $ne: true } } };
 
-    // Grouping everything to get grand totals
     const grandTotalsPromise = Transaction.aggregate([
       matchStage,
       {
@@ -29,7 +28,7 @@ class DashboardService {
       }
     ]);
 
-    // Category breakdown
+    // category-wise breakdown
     const categoryBreakdownPromise = Transaction.aggregate([
       matchStage,
       {
@@ -64,8 +63,6 @@ class DashboardService {
 
   static async getTrends() {
     const matchStage = { $match: { isDeleted: { $ne: true } } };
-
-    // Grouping by year and month
     const trends = await Transaction.aggregate([
       matchStage,
       {

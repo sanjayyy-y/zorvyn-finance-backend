@@ -7,7 +7,7 @@ const validate = schema => (req, res, next) => {
     });
     next();
   } catch (error) {
-    // Assuming ZodError
+    // format zod errors nicely
     const formattedErrors = error.errors.map(err => ({
       path: err.path.join('.'),
       message: err.message,

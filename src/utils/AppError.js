@@ -3,8 +3,7 @@ class AppError extends Error {
     super(message);
 
     this.statusCode = statusCode;
-    // Operational errors are predicted errors like validation, bad request, not found
-    this.isOperational = true;
+    this.isOperational = true; // helps us differentiate known errors from unexpected bugs
 
     Error.captureStackTrace(this, this.constructor);
   }

@@ -9,29 +9,25 @@ const routes = require('./routes/index');
 
 const app = express();
 
-// Middlewares
-app.use(helmet()); // Set security HTTP headers
-app.use(cors()); // Enable CORS
-app.use(express.json()); // Body parser
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev')); // Logger
+  app.use(morgan('dev'));
 }
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'success', message: 'API is running successfully.' });
 });
 
-// Mount Routes
 app.use('/api', routes);
 
-// Handle undefined routes
+// 404 handler for undefined routes
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// Global Error Handler
 app.use(globalErrorHandler);
 
 module.exports = app;

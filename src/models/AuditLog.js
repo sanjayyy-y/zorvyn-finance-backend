@@ -9,7 +9,7 @@ const auditLogSchema = new mongoose.Schema(
     },
     entity: {
       type: String,
-      required: true, // e.g., 'Transaction', 'User'
+      required: true,
     },
     entityId: {
       type: mongoose.Schema.ObjectId,
@@ -21,15 +21,14 @@ const auditLogSchema = new mongoose.Schema(
       required: true,
     },
     details: {
-      type: Object, // Can store diffs, what changed, or the whole snapshot
+      type: Object,
     },
   },
   {
-    timestamps: true, // Adds createdAt, updatedAt
+    timestamps: true,
   }
 );
 
-// We generally only read from AuditLogs, no updates are needed.
 auditLogSchema.index({ entity: 1, action: 1 });
 auditLogSchema.index({ performedBy: 1 });
 

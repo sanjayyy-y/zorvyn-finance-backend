@@ -5,7 +5,7 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 
 exports.protect = catchAsync(async (req, res, next) => {
-  // 1) Getting token and check if it's there
+  // grab token from Authorization header
   let token;
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
@@ -15,28 +15,27 @@ exports.protect = catchAsync(async (req, res, next) => {
     return next(new AppError('You are not logged in! Please log in to get access.', 401));
   }
 
-  // 2) Verification of token
+  // verify token is legit
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  // 3) Check if user still exists
+  // make sure user still exists in the db
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
     return next(new AppError('The user belonging to this token no longer exists.', 401));
   }
 
-  // 4) Check if user is active
+  // block inactive users
   if (currentUser.status !== 'ACTIVE') {
     return next(new AppError('This user account is inactive. Please contact support.', 403));
   }
 
-  // Grant access to protected route
+  // attach user to request so downstream handlers can use it
   req.user = currentUser;
   next();
 });
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    // roles is an array ['ADMIN', 'ANALYST']
     if (!roles.includes(req.user.role)) {
       return next(new AppError('You do not have permission to perform this action', 403));
     }
