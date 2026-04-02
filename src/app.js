@@ -8,6 +8,10 @@ const AppError = require('./utils/AppError');
 const routes = require('./routes/index');
 
 const app = express();
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('../swagger.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(helmet());
 app.use(cors());
